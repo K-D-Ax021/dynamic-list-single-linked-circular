@@ -1,21 +1,23 @@
-﻿#include <iostream>
+﻿
+#include <iostream>
 #include <vector>
 
-struct Node {
-    int x;
-    Node *Next;
-};
+
 
 class List {
-    Node* Head, * Tail;
-
+    struct Node {
+        int x;
+        Node* Next;
+    };
+    Node* Head, * Tail, *Current;
+    
 public:
-
-    List() :Head(NULL), Tail(NULL) {};
+    int lenght = 0;
+    List() :Head(NULL), Tail(NULL), Current(NULL) {};
     ~List();//2
 
 
-    
+
     //void MakeList();//1
     void AddElement(int x);//3
     void DeleteThis(int x);//4
@@ -26,12 +28,98 @@ public:
 };
 std::vector<List> moreLists;
 
-List::~List(){
+List::~List() {
     /*while(Head) {
         Tail = Head->Next;
         delete Head;
         Head = Tail;
     }*/
+    //free(Current);
+}
+
+
+void List::DeleteThis(int xDelete) {
+    if (Head == nullptr) {
+        std::cout << "List is empty!" << std::endl;
+        return;
+    } 
+
+    Current = Head;
+    Node* previous = nullptr;
+
+    for (int count = lenght; count > 0; count--) {
+        Node* next = Current->Next; 
+        if (Current->x == xDelete) {
+            if (Current == Head) {
+                if (lenght == 1) {
+                    // Если это последний элемент в списке
+                    delete Current;
+                    Head = nullptr;
+                    Tail = nullptr;
+                    lenght--;
+                    return;
+                }
+                else {
+                    // Удаление головы, но список не пуст
+                    Head = Current->Next;
+                    Tail->Next = Head;
+                }
+            }
+            else {
+                // Удаление не головы
+                previous->Next = Current->Next;
+                if (Current == Tail) {
+                    // Если это последний элемент
+                    Tail = previous;
+                    Tail->Next = Head;
+                }
+            }
+
+            delete Current;
+            Current = nullptr;
+            lenght--;
+        }
+        else {
+            previous = Current;
+        }
+
+        Current = next;
+       
+    }
+}
+void List::DeleteAfter(int xAfter) {
+    Current = Head;
+    for (int i = 0; i < lenght; i++) {
+        
+       
+        if (Current->x == xAfter) {
+
+            Node* tmp = Current->Next;
+            Current->Next = Current->Next->Next;
+
+            if (tmp == Head) Head = tmp->Next;
+            delete tmp;
+            lenght--;
+        }
+        Current = Current->Next;
+
+    }
+    
+}
+
+void List::SearchThis(int xSearch) {
+    if (Head == nullptr) {
+        std::cout << "List empty!" << std::endl;
+    }
+    Current = Head;
+    for (int i = 0; i < lenght; i++) {
+        if (Current->x == xSearch) {
+            std::cout << "Element : " << xSearch << " is in the list" << std::endl;
+            return;
+        }
+        Current = Current->Next;
+    }
+    std::cout << "Element : " << xSearch << " is not in the list" << std::endl;
 }
 
 
@@ -43,14 +131,15 @@ void List::AddElement(int Xpast) {
     if (Head == nullptr) {
         Head = newNode;
         Tail = newNode;
-        newNode->Next = Head; 
+        newNode->Next = Head;
     }
     else {
-        
-        Tail->Next = newNode;   
-        newNode->Next = Head;   
-        Tail = newNode;         
+
+        Tail->Next = newNode;
+        newNode->Next = Head;
+        Tail = newNode;
     }
+    lenght++;
 }
 
 void List::PrintList() {
@@ -68,6 +157,16 @@ void MakeList() {
     moreLists.push_back(List());
 }
 
+void Menu() {
+
+    while (true) {
+    
+    
+    
+    
+    }
+
+}
 
 int main()
 {
@@ -75,12 +174,20 @@ int main()
     moreLists[0].AddElement(45);
     moreLists[0].AddElement(775);
     moreLists[0].AddElement(896);
+    moreLists[0].AddElement(45);
+    moreLists[0].AddElement(115);
+    moreLists[0].AddElement(102);
     moreLists[0].PrintList();
-    MakeList();
+    moreLists[0].SearchThis(775);
+    moreLists[0].DeleteThis(45);
+    moreLists[0].DeleteAfter(45);
+    moreLists[0].PrintList();
+    moreLists[0].SearchThis(45);
+
+    /*MakeList();
     moreLists[1].AddElement(8855);
     moreLists[1].AddElement(5);
     moreLists[1].AddElement(6);
-    moreLists[1].PrintList();
-    
-}
+    moreLists[1].PrintList();*/
 
+}
