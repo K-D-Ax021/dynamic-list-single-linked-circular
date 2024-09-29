@@ -185,15 +185,28 @@ void MakeList() {
     countList++;
 }
 
-void List::DeleteList()
-{
-    //ошибка в связях?
-   
-    
+void List::DeleteList() {
+    if (Head == nullptr) {
+        std::cout << "List is already empty!" << std::endl;
+        return;
+    }
+
+    Node* current = Head;
+    Node* next = nullptr;
+
+    do {
+        next = current->Next;
+        delete current;
+        current = next;
+    } while (current != Head);
+
+    Head = nullptr;
+    Tail = nullptr;
+    lenght = 0;
+
+    std::cout << "List deleted successfully!" << std::endl;
 }
-void DeleteListApprove() {
-    
-}
+
 
 void MenuOut() {
 
@@ -418,5 +431,5 @@ int main()
     Menu();
 
     // todo исправить вывод какие есть листы
-    // todo починить и проверить удаление
+    // todo проверить удаление
 }
