@@ -169,20 +169,41 @@ void List::PrintList() {
 }
 
 void MakeList() {
-    if (countList == 4) {
-        std::cout << "MAX count List!";
+    if (countList >= 4) {
+        std::cout << "MAX count List!" << std::endl;
         return;
     }
 
-    
     std::string nameList;
-    std::cout << "Enter name new list : ";
+    std::cout << "Enter name of the new list: ";
     std::cin >> nameList;
-    //moreLists.push_back(List());
-    
-    mapLists[nameList] = countList+1;
+    if (mapLists.find(nameList) != mapLists.end()) {
+        
+        std::cout << " SAME NAME LIST! ERROR!" << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        return;
+    }
+    mapLists[nameList] = countList + 1;
     moreLists.push_back(List());
     countList++;
+    
+    
+}
+void DeleteMapList(const std::string& nameList) {
+    auto it = mapLists.find(nameList);
+    if (it != mapLists.end()) {
+        int index = it->second - 1;  // Индекс списка
+        moreLists.erase(moreLists.begin() + index);
+        mapLists.erase(it);
+
+        // Обновляем индексы в mapLists после удаления
+        int newIndex = 1;
+        for (auto& pair : mapLists) {
+            pair.second = newIndex++;
+        }
+
+        countList--;  
+    }
 }
 
 void List::DeleteList() {
@@ -292,16 +313,16 @@ void Menu() {
                             {
                                 break;
                             }
-                           
-                            moreLists[nowWorkList-1].AddElement(numb);
+
+                            moreLists[nowWorkList - 1].AddElement(numb);
 
                         }
-                       
+
                     }
                 }
-                
-                
-                
+
+
+
                 break;
             case 3:
                 if (countList == 0) {
@@ -321,7 +342,7 @@ void Menu() {
                         int numb = 0;
                         std::cout << "Enter number what you want to delete : ";
                         std::cin >> numb;
-                        moreLists[nowWorkList-1].DeleteThis(numb);
+                        moreLists[nowWorkList - 1].DeleteThis(numb);
                     }
                 }
                 break;
@@ -343,7 +364,7 @@ void Menu() {
                         int numb = 0;
                         std::cout << "Enter number after there to delete : ";
                         std::cin >> numb;
-                        moreLists[nowWorkList-1].DeleteAfter(numb);
+                        moreLists[nowWorkList - 1].DeleteAfter(numb);
                     }
                 }
                 break;
@@ -365,7 +386,7 @@ void Menu() {
                         int numb = 0;
                         std::cout << "Enter number what you want search : ";
                         std::cin >> numb;
-                        moreLists[nowWorkList-1].SearchThis(numb);
+                        moreLists[nowWorkList - 1].SearchThis(numb);
                         std::this_thread::sleep_for(std::chrono::seconds(2));
                     }
                 }
@@ -385,43 +406,33 @@ void Menu() {
                         break;
                     }
                     else {
-                        
-                        moreLists[nowWorkList-1].PrintList();
+
+                        moreLists[nowWorkList - 1].PrintList();
                         std::this_thread::sleep_for(std::chrono::seconds(3));
                     }
                 }
                 break;
-            case 7:
+            case 7:  
                 if (countList == 0) {
-                    std::cout << "At first Create List!" << std::endl;
+                    std::cout << "At first, create a list!" << std::endl;
                     std::this_thread::sleep_for(std::chrono::seconds(1));
-                    break;
                 }
                 else {
-                    std::cout << "Choose number list : ";
-                    std::cin >> nowWorkList;
-                    if (nowWorkList > countList || nowWorkList < 1) {
-                        std::cout << "Unknown List ! " << std::endl;
-                        std::this_thread::sleep_for(std::chrono::seconds(1));
-                        break;
-                    }
-                    else {
-                        moreLists[nowWorkList-1].DeleteList();
-                        // todo исправить вывод какие есть листы 
-
-                        countList--;
-                    }
+                    std::string nameList;
+                    std::cout << "Enter the name of the list to delete: ";
+                    std::cin >> nameList;
+                    DeleteMapList(nameList);
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
                 }
-
                 break;
             default:
                 break;
             }
-        
+
         }
 
         system("cls");
-    
+
     } while (true);
 
 }
@@ -430,6 +441,4 @@ int main()
 {
     Menu();
 
-    // todo исправить вывод какие есть листы
-    // todo проверить удаление
 }
