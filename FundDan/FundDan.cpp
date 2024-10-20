@@ -8,8 +8,9 @@
 #include <thread>
 
 struct Node {
-    int x;
+    int x = 0;
     Node* Next;
+    
 };
 class List {
     
@@ -18,7 +19,7 @@ class List {
 public:
     Node* Head, * Tail, * Current;
     int lenght = 0;
-    List() :Head(NULL), Tail(NULL), Current(NULL) {};
+    List() :Head(nullptr), Tail(nullptr), Current(nullptr) {};
     ~List();//2
 
 
@@ -27,9 +28,9 @@ public:
     void AddElement(int x);//3
     void DeleteThis(int x);//4
     void DeleteAfter(int x); //5
-    void SearchThis(int x); //6
+    bool SearchThis(int x); //6
     void PrintList(); //7
-    //-------------- 8
+    //void intersectLists(Node* head1, Node* head2);//-------------- 8
     void DeleteList();
 };
 //List arrayLists[5];
@@ -39,12 +40,7 @@ int countList = 0;
 int nowWorkList = 0;
 
 List::~List() {
-    /*while(Head) {
-        Tail = Head->Next;
-        delete Head;
-        Head = Tail;
-    }*/
-    //free(Current);
+  
 }
 
 
@@ -117,19 +113,21 @@ void List::DeleteAfter(int xAfter) {
     
 }
 
-void List::SearchThis(int xSearch) {
+bool List::SearchThis(int xSearch) {
     if (Head == nullptr) {
         std::cout << "List empty!" << std::endl;
+        return false;
     }
     Current = Head;
     for (int i = 0; i < lenght; i++) {
         if (Current->x == xSearch) {
             std::cout << "Element : " << xSearch << " is in the list" << std::endl;
-            return;
+            return true;
         }
         Current = Current->Next;
     }
     std::cout << "Element : " << xSearch << " is not in the list" << std::endl;
+    return false;
 }
 
 
@@ -161,50 +159,50 @@ void List::PrintList() {
     } 
 
     Node* temp = Head;
-    do {
+ 
+    for (int h = 0; h < lenght; h++) {
         std::cout << temp->x << " ";
         temp = temp->Next;
-    } while (temp != Head);
+    
+    }
     std::cout << std::endl;
 }
 
-void MakeList() {
-    if (countList >= 4) {
-        std::cout << "MAX count List!" << std::endl;
-        return;
-    }
 
+void intersectionList(int xl, int yl) {
     std::string nameList;
-    std::cout << "Enter name of the new list: ";
+    std::cout << "Enter name of the new Intersection list: ";
     std::cin >> nameList;
+
     if (mapLists.find(nameList) != mapLists.end()) {
-        
-        std::cout << " SAME NAME LIST! ERROR!" << std::endl;
+        std::cout << "SAME NAME LIST! ERROR!" << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
         return;
     }
+
     mapLists[nameList] = countList + 1;
     moreLists.push_back(List());
     countList++;
-    
-    
-}
-void DeleteMapList(const std::string& nameList) {
-    auto it = mapLists.find(nameList);
-    if (it != mapLists.end()) {
-        int index = it->second - 1;  // Индекс списка
-        moreLists.erase(moreLists.begin() + index);
-        mapLists.erase(it);
 
-        // Обновляем индексы в mapLists после удаления
-        int newIndex = 1;
-        for (auto& pair : mapLists) {
-            pair.second = newIndex++;
+
+
+    Node* numberYl = moreLists[yl-1].Head;
+    for (int i = 0; i < moreLists[yl-1].lenght; i++) {
+        
+        if (moreLists[countList - 1].lenght == 0) {
+            if (moreLists[xl - 1].SearchThis(numberYl->x)) {
+                moreLists[countList - 1].AddElement(numberYl->x);
+            }
         }
-
-        countList--;  
+        else if (moreLists[xl - 1].SearchThis(numberYl->x) && !(moreLists[countList - 1].SearchThis(numberYl->x))) {
+            moreLists[countList - 1].AddElement(numberYl->x);
+        }
+        numberYl = numberYl->Next;
+    
     }
+
 }
+
 
 void List::DeleteList() {
     if (Head == nullptr) {
@@ -221,6 +219,7 @@ void List::DeleteList() {
         current = next;
     } while (current != Head);
 
+   
     Head = nullptr;
     Tail = nullptr;
     lenght = 0;
@@ -228,6 +227,39 @@ void List::DeleteList() {
     std::cout << "List deleted successfully!" << std::endl;
 }
 
+void MakeList() {
+  
+    std::string nameList;
+    std::cout << "Enter name of the new list: ";
+    std::cin >> nameList;
+    if (mapLists.find(nameList) != mapLists.end()) {
+
+        std::cout << " SAME NAME LIST! ERROR!" << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        return;
+    }
+    mapLists[nameList] = countList + 1;
+    moreLists.push_back(List());
+    countList++;
+
+
+}
+void DeleteMapList(const std::string& nameList) {
+    auto it = mapLists.find(nameList);
+    if (it != mapLists.end()) {
+        int index = it->second - 1;  // Индекс списка
+        moreLists.erase(moreLists.begin() + index);
+        mapLists.erase(it);
+
+        // Обновляем индексы в mapLists после удаления
+        int newIndex = 1;
+        for (auto& pair : mapLists) {
+            pair.second = newIndex++;
+        }
+
+        countList--;
+    }
+}
 
 void MenuOut() {
 
@@ -249,6 +281,7 @@ void MenuOut() {
     std::cout << "5 Search elements" << std::endl;
     std::cout << "6 Print list" << std::endl;
     std::cout << "7 Delete List" << std::endl;
+    std::cout << "8 intersection List" << std::endl;
     SetConsoleTextAttribute(
         console_color, 2);
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
@@ -281,7 +314,7 @@ void Menu() {
         MenuOut();
         std::cout << "Enter code Command : ";
         std::cin >> codeCommand;
-        if (codeCommand > 7 || codeCommand < 1) {
+        if (codeCommand > 8 || codeCommand < 1) {
             std::cout << "Unknown command !" << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
@@ -305,12 +338,20 @@ void Menu() {
                         break;
                     }
                     else {
-                        std::cout << "Enter Numbers what you want to add, or enter '-1' keyword to exit  : ";
+                        std::cout << "Enter Numbers what you want to add, or enter 'e' keyword to exit  : ";
                         int numb = 0;
+                        std::string inp = "";
                         while (true) {
-                            std::cin >> numb;
-                            if (numb == -1)
+                            std::cin >> inp;
+                            if (inp == "e")
                             {
+                                break;
+                            }
+                            try {
+                                numb = std::stoi(inp);
+                            }
+                            catch(std::invalid_argument&){
+                                std::cout << "Invalid input!" << std::endl;
                                 break;
                             }
 
@@ -425,6 +466,21 @@ void Menu() {
                     std::this_thread::sleep_for(std::chrono::seconds(1));
                 }
                 break;
+            case 8:
+                if (countList == 0) {
+                    std::cout << "At first, create a list!" << std::endl;
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                }
+                else {
+                    int xi, yi;
+                    std::cout << "Print furst list : ";
+                    std::cin >> xi;
+                    std::cout << "Print second list : ";
+                    std::cin >> yi;
+                    intersectionList(xi, yi);
+
+                }
+        
             default:
                 break;
             }
